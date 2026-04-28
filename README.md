@@ -12,7 +12,7 @@ The service is designed to run in multiple environments (**qa, staging, prod**) 
 
 I followed a simple and practical branching model:
 
-
+![Pipeline](sync-service-cicd/branch.png)
 feature/* → dev → staging → main
 
 
