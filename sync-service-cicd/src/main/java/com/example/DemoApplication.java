@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class DemoApplication {
 
-    @GetMapping("/actuator/health")
+    @GetMapping("/health")
     public String health() {
         return "UP";
     }
