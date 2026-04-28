@@ -59,16 +59,14 @@ pipeline {
 
         stage('Deploy (Local)') {
             when {
-                anyOf {
-                    branch 'dev'
-                    branch 'staging'
-                    branch 'main'
+                expression {
+                    return env.CURRENT_BRANCH in ['dev', 'staging', 'main']
                 }
             }
             steps {
                  script {
                     def envName = getTargetEnv(env.CURRENT_BRANCH)
-                    echo "Deploying branch ${env.BRANCH_NAME} to ${envName}"
+                    echo "Deploying branch ${env.CURRENT_BRANCH} to ${envName}"
                     dir('sync-service-cicd') {
                         sh "./deploy.sh ${envName}"
                     }
