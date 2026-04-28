@@ -56,8 +56,12 @@ pipeline {
                 }
             }
             steps {
-                dir('sync-service-cicd') {
-                    sh './deploy.sh'
+                 script {
+                    def envName = getTargetEnv(env.BRANCH_NAME)
+                    echo "Deploying branch ${env.BRANCH_NAME} to ${envName}"
+                    dir('sync-service-cicd') {
+                        sh "./deploy.sh ${envName}"
+                    }
                 }
             }
         }
