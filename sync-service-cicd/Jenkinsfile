@@ -19,9 +19,11 @@ pipeline {
         stage('Init') {
             steps {
                 script {
-                    env.TARGET_ENV = getTargetEnv(env.BRANCH_NAME)
+                    def branch = env.GIT_BRANCH?.replace("origin/", "")
+                    env.TARGET_ENV = getTargetEnv(branch)
+                    env.CURRENT_BRANCH = branch
                 }
-                echo " Branch: ${env.BRANCH_NAME} → Environment: ${env.TARGET_ENV}"
+                echo "Branch: ${env.CURRENT_BRANCH} → Environment: ${env.TARGET_ENV}"
             }
         }
 
@@ -57,16 +59,14 @@ pipeline {
 
         stage('Deploy (Local)') {
             when {
-                anyOf {
-                    branch 'dev'
-                    branch 'staging'
-                    branch 'main'
+                expression {
+                    return env.CURRENT_BRANCH in ['dev', 'staging', 'main']
                 }
             }
             steps {
                  script {
-                    def envName = getTargetEnv(env.BRANCH_NAME)
-                    echo "Deploying branch ${env.BRANCH_NAME} to ${envName}"
+                    def envName = getTargetEnv(env.CURRENT_BRANCH)
+                    echo "Deploying branch ${env.CURRENT_BRANCH} to ${envName}"
                     dir('sync-service-cicd') {
                         sh "./deploy.sh ${envName}"
                     }
