@@ -4,7 +4,7 @@ echo "Starting deployment..."
 
 ENV=$1
 
-echo "🚀 Deploying to $ENV..."
+echo "Deploying to $ENV..."
 
 docker stop sync-service 2>/dev/null || true
 docker rm sync-service 2>/dev/null || true
