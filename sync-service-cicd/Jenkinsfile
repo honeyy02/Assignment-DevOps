@@ -38,7 +38,9 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t sync-service:local .'
+                dir('sync-service-cicd') {
+                    sh 'docker build -t sync-service:local .'
+                }
             }
         }
 
