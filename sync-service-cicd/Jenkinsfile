@@ -9,17 +9,19 @@ pipeline {
 
         // stage('Checkout') {
         //     steps {
-        //         checkout scm
+        //         git url: 'https://github.com/honeyy02/Assignment-DevOps.git', branch: "${env.BRANCH_NAME}"
         //         script {
-        //             env.GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
         //             env.TARGET_ENV = getTargetEnv(env.BRANCH_NAME)
         //         }
         //         echo "Branch: ${env.BRANCH_NAME} → Environment: ${env.TARGET_ENV}"
         //     }
         // }
-        stage('Checkout') {
+        stage('Init') {
             steps {
-                git url: 'https://github.com/honeyy02/Assignment-DevOps.git', branch: 'main'
+                script {
+                    env.TARGET_ENV = getTargetEnv(env.BRANCH_NAME)
+                }
+                echo " Branch: ${env.BRANCH_NAME} → Environment: ${env.TARGET_ENV}"
             }
         }
 
@@ -44,10 +46,30 @@ pipeline {
             }
         }
 
-        stage('Deploy (Local)') {
+        stage('Approval (Prod)') {
+            when {
+                branch 'main'
+            }
             steps {
-                dir('sync-service-cicd') {
-                    sh './deploy.sh'
+                input message: "Deploy to PRODUCTION?"
+            }
+        }
+
+        stage('Deploy (Local)') {
+            when {
+                anyOf {
+                    branch 'dev'
+                    branch 'staging'
+                    branch 'main'
+                }
+            }
+            steps {
+                 script {
+                    def envName = getTargetEnv(env.BRANCH_NAME)
+                    echo "Deploying branch ${env.BRANCH_NAME} to ${envName}"
+                    dir('sync-service-cicd') {
+                        sh "./deploy.sh ${envName}"
+                    }
                 }
             }
         }
