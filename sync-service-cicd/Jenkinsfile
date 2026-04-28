@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = 'sync-service'
+    }
+
+    stages {
+
+        // stage('Checkout') {
+        //     steps {
+        //         checkout scm
+        //         script {
+        //             env.GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+        //             env.TARGET_ENV = getTargetEnv(env.BRANCH_NAME)
+        //         }
+        //         echo "Branch: ${env.BRANCH_NAME} → Environment: ${env.TARGET_ENV}"
+        //     }
+        // }
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/honeyy02/Assignment-DevOps.git', branch: 'main'
+            }
+        }
+
+        stage('Build') {
+            agent {
+                docker {
+                    image 'maven:3.9.9-eclipse-temurin-17'
+                }
+            }
+            steps {
+                dir('sync-service-cicd') {
+                    sh 'mvn clean package'
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t sync-service:local .'
+            }
+        }
+
+        stage('Deploy (Local)') {
+            steps {
+                dir('sync-service-cicd') {
+                    sh './deploy.sh'
+                }
+            }
+        }
+    }
+}
+
+def getTargetEnv(branch) {
+    switch (branch) {
+        case 'dev':     return 'qa'
+        case 'staging': return 'staging'
+        case 'main':    return 'prod'
+        default:        return 'local'
+    }
+}
