@@ -7,13 +7,21 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        // stage('Checkout') {
+        //     steps {
+        //         git url: 'https://github.com/honeyy02/Assignment-DevOps.git', branch: "${env.BRANCH_NAME}"
+        //         script {
+        //             env.TARGET_ENV = getTargetEnv(env.BRANCH_NAME)
+        //         }
+        //         echo "Branch: ${env.BRANCH_NAME} → Environment: ${env.TARGET_ENV}"
+        //     }
+        // }
+        stage('Init') {
             steps {
-                git url: 'https://github.com/honeyy02/Assignment-DevOps.git', branch: "${env.BRANCH_NAME}"
                 script {
                     env.TARGET_ENV = getTargetEnv(env.BRANCH_NAME)
                 }
-                echo "Branch: ${env.BRANCH_NAME} → Environment: ${env.TARGET_ENV}"
+                echo " Branch: ${env.BRANCH_NAME} → Environment: ${env.TARGET_ENV}"
             }
         }
 
